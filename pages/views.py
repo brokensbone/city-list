@@ -7,5 +7,5 @@ def home_page_view(request):
 
 
 def about_page_view(request):
-    return HttpResponse("<h1>About usss</h1>")
+    return HttpResponse("<h1>About us</h1>")
 
