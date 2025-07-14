@@ -1,0 +1,5 @@
+city_list_project/__pycache__
+db.sqlite3
+pages/__pycache__
+pages/migrations/__pycache__
+.env
