@@ -1,0 +1,30 @@
+name: Lint
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: '.python-version'
+
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        uv-version: '0.7.19'
+        enable-cache: true
+
+    - name: Install dependencies
+      run: uv sync --locked --all-extras --dev
+
+    - name: Run linter
+      run: uv run ruff check .
