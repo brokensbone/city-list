@@ -24,7 +24,7 @@ jobs:
         enable-cache: true
 
     - name: Install dependencies
-      run: uv sync --all-extras
+      run: uv sync -v --all-extras --dev
 
     - name: Run linter
       run: uv run ruff check .
