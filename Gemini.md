@@ -2,7 +2,11 @@
 
 ## Project Overview
 
-This project is a web application with a Django backend and a TypeScript-based frontend.
+This project is a website which tracks restaurants, bars, and food/drink shops in a city (starting with Leeds). It has two main functions:
+1.  Showing the range of things available.
+2.  Acting as an archive of much-missed closed places.
+
+The backend is Django, the frontend is TypeScript-based.
 
 ## Key Technologies
 

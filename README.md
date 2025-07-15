@@ -4,7 +4,12 @@ A web application with a Django backend.
 
 ## Overview
 
-This project is the backend for the City List application. It's built with Django and uses a PostgreSQL database. The development environment is containerized using Docker Compose for consistency and ease of use.
+This project is a website which tracks restaurants, bars, and food/drink shops in a city, starting with Leeds. It has two main functions:
+
+1.  Showcasing the range of currently open and available places.
+2.  Acting as an archive of much-missed closed places.
+
+The backend is built with Django and uses a PostgreSQL database. The development environment is containerized using Docker Compose for consistency and ease of use.
 
 The project is set up with a focus on code quality, with automated linting and testing pipelines.
 
