@@ -1,7 +1,6 @@
 import factory
 from factory.django import DjangoModelFactory
 from .models import Business, BusinessGroup
-import datetime
 
 class BusinessGroupFactory(DjangoModelFactory):
     class Meta:

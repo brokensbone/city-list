@@ -35,3 +35,7 @@ The backend is Django, the frontend is TypeScript-based.
 - **Run tests locally:** `./run_tests.sh`
 - **Run linter and fix issues:** `./run_lint.sh`
 - **Create a superuser:** `docker compose exec web uv run python manage.py createsuperuser`
+
+## Final Checks
+
+- Before completing a task, always run the local linting script to ensure code quality: `./run_lint.sh`

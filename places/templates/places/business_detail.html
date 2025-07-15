@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>{{ business.name }}</title>
-</head>
-<body>
-    <h1>{{ business.name }}</h1>
-    <p><strong>Group:</strong> {{ business.business_group.name }}</p>
-    <p><strong>Category:</strong> {{ business.get_category_display }}</p>
-    <p><strong>Opened:</strong> {{ business.date_opened }}</p>
-    {% if business.date_closed %}
-        <p><strong>Closed:</strong> {{ business.date_closed }}</p>
-    {% else %}
-        <p><strong>Status:</strong> Currently Open</p>
-    {% endif %}
-    <p><strong>Location:</strong> ({{ business.latitude }}, {{ business.longitude }})</p>
-    {% if business.notes %}
-        <h2>Notes</h2>
-        <p>{{ business.notes }}</p>
-    {% endif %}
-    <br>
-    <a href="{% url 'places:business-list' %}">Back to list</a>
-</body>
+    <head>
+        <title>{{ business.name }}</title>
+    </head>
+    <body>
+        <h1>{{ business.name }}</h1>
+        <p>
+            <strong>Group:</strong> {{ business.business_group.name }}
+        </p>
+        <p>
+            <strong>Category:</strong> {{ business.get_category_display }}
+        </p>
+        <p>
+            <strong>Opened:</strong> {{ business.date_opened }}
+        </p>
+        {% if business.date_closed %}
+            <p>
+                <strong>Closed:</strong> {{ business.date_closed }}
+            </p>
+        {% else %}
+            <p>
+                <strong>Status:</strong> Currently Open
+            </p>
+        {% endif %}
+        <p>
+            <strong>Location:</strong> ({{ business.latitude }}, {{ business.longitude }})
+        </p>
+        {% if business.notes %}
+            <h2>Notes</h2>
+            <p>{{ business.notes }}</p>
+        {% endif %}
+        <br>
+        <a href="{% url 'places:business-list' %}">Back to list</a>
+    </body>
 </html>
