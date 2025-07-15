@@ -1,0 +1,30 @@
+# .github/dependabot.yml
+version: 2
+updates:
+  # Keep Python dependencies up-to-date
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Group updates to reduce noise
+    groups:
+      django:
+        patterns:
+          - "django"
+          - "djangorestframework" # Example for the future
+      python-misc:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "django"
+          - "djangorestframework"
+
+  # Keep GitHub Actions up-to-date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
