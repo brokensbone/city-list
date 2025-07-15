@@ -17,6 +17,12 @@ The backend is Django, the frontend is TypeScript-based.
 - **Linting:** `ruff`
 - **Local Development:** Docker Compose
 
+## Data Models
+
+- **`places` app**: Contains the core models.
+- **`BusinessGroup`**: A parent company for businesses.
+- **`Business`**: An individual establishment.
+
 ## Development Focus
 
 - **Testing:** A strong emphasis is placed on comprehensive testing. All new features should be accompanied by tests.

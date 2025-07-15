@@ -13,6 +13,15 @@ The backend is built with Django and uses a PostgreSQL database. The development
 
 The project is set up with a focus on code quality, with automated linting and testing pipelines.
 
+## Data Models
+
+The core data is organized into two main models within the `places` app:
+
+-   **`BusinessGroup`**: Represents a parent company or group that may own multiple individual businesses (e.g., a coffee shop chain).
+-   **`Business`**: Represents a single establishment. It includes details like its name, category (Restaurant, Bar, Shop), location (latitude/longitude), and its opening and closing dates. Each `Business` must belong to a `BusinessGroup`.
+
+These models are accessible and manageable via the Django admin interface.
+
 ## Getting Started
 
 ### Prerequisites
