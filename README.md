@@ -22,6 +22,16 @@ The core data is organized into two main models within the `places` app:
 
 These models are accessible and manageable via the Django admin interface.
 
+## Configuration
+
+The application can be configured via environment variables. The following variables are available:
+
+-   `MAP_CENTER_LAT`: The latitude for the initial map view.
+-   `MAP_CENTER_LNG`: The longitude for the initial map view.
+-   `MAP_ZOOM_LEVEL`: The initial zoom level for the map.
+
+These can be set in the `docker-compose.yml` file for local development.
+
 ## Getting Started
 
 ### Prerequisites
