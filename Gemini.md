@@ -33,7 +33,7 @@ The backend is Django, the frontend is TypeScript-based.
 
 ## Development Focus
 
-- **Testing:** A strong emphasis is placed on comprehensive testing. All new features should be accompanied by tests.
+- **Testing:** A strong emphasis is placed on comprehensive testing. For any new feature, I must always suggest and, upon approval, implement appropriate unit and integration tests.
 - **Code Formatting:** Code should be well-formatted and adhere to consistent style guidelines.
 - **CI/CD:** The project utilizes GitHub Actions to automate checks (linting and testing) and deployment.
 
