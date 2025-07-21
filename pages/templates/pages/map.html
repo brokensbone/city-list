@@ -30,6 +30,15 @@
             maxZoom: 19,
             attribution: '© OpenStreetMap'
         }).addTo(map);
+
+        fetch('/api/businesses/')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(business => {
+                    var marker = L.marker([business.latitude, business.longitude]).addTo(map);
+                    marker.bindPopup(`<b>${business.name}</b><br>${business.business_group.name}`);
+                });
+            });
         </script>
     </body>
 </html>
