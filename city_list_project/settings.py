@@ -38,8 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Local apps
     'pages',
     'places',
+    'api',
+    # Third-party apps
+    'rest_framework',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +132,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Map settings
+MAP_CENTER_LAT = os.environ.get('MAP_CENTER_LAT', '53.8008')
+MAP_CENTER_LNG = os.environ.get('MAP_CENTER_LNG', '-1.5491')
+MAP_ZOOM_LEVEL = os.environ.get('MAP_ZOOM_LEVEL', '13')
+
+# DRF settings
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}

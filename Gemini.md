@@ -10,23 +10,31 @@ The backend is Django, the frontend is TypeScript-based.
 
 ## Key Technologies
 
-- **Backend:** Django
+- **Backend:** Django, Django Rest Framework
 - **Database:** PostgreSQL
+- **API Schema:** drf-spectacular
 - **Frontend:** TypeScript (specific framework to be determined)
 - **Dependency Management:** `uv`
-- **Linting:** `ruff`
+- **Linting:** `ruff` (Python), `djlint` (HTML)
+- **Testing:** `factory-boy`
 - **Local Development:** Docker Compose
 
 ## Data Models
 
-- **`places` app**: Contains the core models.
-- **`BusinessGroup`**: A parent company for businesses.
-- **`Business`**: An individual establishment.
+- **`places` app**: Contains the core models for businesses and business groups.
+- **`api` app**: Contains API views and serializers.
+
+## API Endpoints
+
+- **/api/status/**: Simple status check.
+- **/api/businesses/**: Lists all open businesses.
+- **/api/schema/**: OpenAPI schema.
+- **/api/schema/swagger-ui/**: Swagger UI.
 
 ## Development Focus
 
-- **Testing:** A strong emphasis is placed on comprehensive testing. All new features should be accompanied by tests.
-- **Code Formatting:** Code should be well-formatted and adhere to consistent style guidelines using `ruff`.
+- **Testing:** A strong emphasis is placed on comprehensive testing. For any new feature, I must always suggest and, upon approval, implement appropriate unit and integration tests.
+- **Code Formatting:** Code should be well-formatted and adhere to consistent style guidelines.
 - **CI/CD:** The project utilizes GitHub Actions to automate checks (linting and testing) and deployment.
 
 ## Useful Commands
