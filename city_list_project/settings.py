@@ -138,6 +138,12 @@ MAP_CENTER_LAT = os.environ.get('MAP_CENTER_LAT', '53.8008')
 MAP_CENTER_LNG = os.environ.get('MAP_CENTER_LNG', '-1.5491')
 MAP_ZOOM_LEVEL = os.environ.get('MAP_ZOOM_LEVEL', '13')
 
+# Map bounds for validation
+MAP_BOUNDS_MIN_LAT = os.environ.get('MAP_BOUNDS_MIN_LAT', '53.7')
+MAP_BOUNDS_MAX_LAT = os.environ.get('MAP_BOUNDS_MAX_LAT', '53.9')
+MAP_BOUNDS_MIN_LNG = os.environ.get('MAP_BOUNDS_MIN_LNG', '-1.7')
+MAP_BOUNDS_MAX_LNG = os.environ.get('MAP_BOUNDS_MAX_LNG', '-1.4')
+
 # DRF settings
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
