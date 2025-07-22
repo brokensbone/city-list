@@ -44,6 +44,7 @@ The application can be configured via environment variables. The following varia
 -   `MAP_CENTER_LAT`: The latitude for the initial map view.
 -   `MAP_CENTER_LNG`: The longitude for the initial map view.
 -   `MAP_ZOOM_LEVEL`: The initial zoom level for the map.
+-   `MAP_BOUNDS_MIN_LAT`, `MAP_BOUNDS_MAX_LAT`, `MAP_BOUNDS_MIN_LNG`, `MAP_BOUNDS_MAX_LNG`: Define the bounding box for business location validation.
 
 These can be set in the `docker-compose.yml` file for local development.
 

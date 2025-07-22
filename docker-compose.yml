@@ -19,6 +19,10 @@ services:
       - MAP_CENTER_LAT=53.8008
       - MAP_CENTER_LNG=-1.5491
       - MAP_ZOOM_LEVEL=13
+      - MAP_BOUNDS_MIN_LAT=53.7431222
+      - MAP_BOUNDS_MAX_LAT=53.9288420
+      - MAP_BOUNDS_MIN_LNG=-1.7116827
+      - MAP_BOUNDS_MAX_LNG=-1.3859940
     depends_on:
       - db
 
