@@ -4,10 +4,10 @@ services:
   web:
     build: .
     command: >
-      ./launch-dev.sh
+      /app/launch-dev.sh
     stop_signal: SIGINT
     volumes:
-      - .:/app
+      - ./src:/app/
     ports:
       - "8000:8000"
     environment:
