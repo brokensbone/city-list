@@ -35,7 +35,7 @@
             .then(response => response.json())
             .then(data => {
                 data.forEach(business => {
-                    var marker = L.marker([business.latitude, business.longitude]).addTo(map);
+                    var marker = L.marker([business.location.latitude, business.location.longitude]).addTo(map);
                     marker.bindPopup(`<b>${business.name}</b><br>${business.business_group.name}`);
                 });
             });
