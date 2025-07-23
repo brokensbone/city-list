@@ -9,23 +9,10 @@ class BusinessGroup(models.Model):
     def __str__(self):
         return self.name
 
-class Business(models.Model):
-    class Category(models.TextChoices):
-        RESTAURANT = 'RESTAURANT', 'Restaurant'
-        BAR = 'BAR', 'Bar'
-        SHOP = 'SHOP', 'Shop'
-
-    name = models.CharField(max_length=255)
-    business_group = models.ForeignKey(BusinessGroup, on_delete=models.CASCADE)
-    category = models.CharField(
-        max_length=10,
-        choices=Category.choices,
-    )
+class Location(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
-    date_opened = models.DateField()
-    date_closed = models.DateField(null=True, blank=True)
-    notes = models.TextField(null=True, blank=True)
+    address = models.TextField(blank=True)
 
     def clean(self):
         min_lat = float(settings.MAP_BOUNDS_MIN_LAT)
@@ -41,6 +28,27 @@ class Business(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"({self.latitude}, {self.longitude})"
+
+
+class Business(models.Model):
+    class Category(models.TextChoices):
+        RESTAURANT = 'RESTAURANT', 'Restaurant'
+        BAR = 'BAR', 'Bar'
+        SHOP = 'SHOP', 'Shop'
+
+    name = models.CharField(max_length=255)
+    business_group = models.ForeignKey(BusinessGroup, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    category = models.CharField(
+        max_length=10,
+        choices=Category.choices,
+    )
+    date_opened = models.DateField()
+    date_closed = models.DateField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
