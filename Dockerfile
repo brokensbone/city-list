@@ -19,7 +19,8 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked
 
 # Copy the rest of the application's code into the container
-COPY ./src ./
+COPY ./src ./src
+WORKDIR /app/src
 
 # Expose the port the app runs on
 EXPOSE 8000
