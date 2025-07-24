@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            {% block title %}City List{% endblock %}
+        </title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    </head>
+    <body>
+        <header>
+            <div class="container">
+                <h1>
+                    <a href="/">City List</a>
+                </h1>
+                <nav>
+                    <ul>
+                        <li>
+                            <a href="{% url 'places:business-list' %}">Businesses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <main>
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+        <footer>
+            <div class="container">
+                <p>&copy; 2025 City List</p>
+            </div>
+        </footer>
+    </body>
+</html>
