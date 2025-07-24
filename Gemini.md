@@ -47,3 +47,4 @@ The backend is Django, the frontend is TypeScript-based.
 ## Final Checks
 
 - Before completing a task, always run the local linting script to ensure code quality: `./run_lint.sh`
+- Use the local Docker development environment to check that changes work: `docker compose up`

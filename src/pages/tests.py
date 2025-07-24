@@ -24,3 +24,17 @@ class PageViewTests(SimpleTestCase):
         self.assertTrue('lat' in response.context)
         self.assertTrue('lng' in response.context)
         self.assertTrue('zoom' in response.context)
+
+    def test_map_page_view_with_params(self):
+        """
+        Tests that the map page view correctly uses query parameters.
+        """
+        lat = 53.8008
+        lng = -1.5491
+        zoom = 17
+        response = self.client.get(f"{reverse('map')}?lat={lat}&lng={lng}&zoom={zoom}")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'pages/map.html')
+        self.assertEqual(response.context['lat'], str(lat))
+        self.assertEqual(response.context['lng'], str(lng))
+        self.assertEqual(response.context['zoom'], str(zoom))

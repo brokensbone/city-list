@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>{{ business.name }}</title>
-    </head>
-    <body>
+{% extends "base.html" %}
+{% block title %}{{ business.name }}{% endblock %}
+{% block content %}
+    <div class="business-detail">
         <h1>{{ business.name }}</h1>
         <p>
-            <strong>Group:</strong> {{ business.business_group.name }}
+            <strong>Group:</strong> <a href="{% url 'places:business-group-detail' business.business_group.pk %}">{{ business.business_group.name }}</a>
         </p>
         <p>
             <strong>Category:</strong> {{ business.get_category_display }}
@@ -31,6 +29,8 @@
             <p>{{ business.notes }}</p>
         {% endif %}
         <br>
+        <a href="{% url 'map' %}?lat={{ business.location.latitude }}&lng={{ business.location.longitude }}&zoom=17">View on map</a>
+        <br>
         <a href="{% url 'places:business-list' %}">Back to list</a>
-    </body>
-</html>
+    </div>
+{% endblock %}

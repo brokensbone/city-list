@@ -13,9 +13,9 @@ def about_page_view(request):
 
 def map_page_view(request):
     context = {
-        'lat': settings.MAP_CENTER_LAT,
-        'lng': settings.MAP_CENTER_LNG,
-        'zoom': settings.MAP_ZOOM_LEVEL,
+        'lat': request.GET.get('lat', settings.MAP_CENTER_LAT),
+        'lng': request.GET.get('lng', settings.MAP_CENTER_LNG),
+        'zoom': request.GET.get('zoom', settings.MAP_ZOOM_LEVEL),
     }
     return render(request, 'pages/map.html', context)
 
