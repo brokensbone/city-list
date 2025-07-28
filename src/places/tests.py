@@ -1,6 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
-from .factories import BusinessFactory, BusinessGroupFactory
+from django.contrib.auth import get_user_model
+from .factories import BusinessFactory, BusinessGroupFactory, LocationFactory
+from .models import Location
+
+User = get_user_model()
 
 class BusinessViewTests(TestCase):
     def test_business_list_view(self):
@@ -71,3 +75,70 @@ class BusinessGroupViewTests(TestCase):
         self.assertEqual(businesses_in_context[0], business_a)
         self.assertEqual(businesses_in_context[1], business_b)
         self.assertEqual(businesses_in_context[2], business_c)
+
+class LocationAdminTests(TestCase):
+    def setUp(self):
+        self.superuser = User.objects.create_superuser(
+            'admin', 'admin@example.com', 'password'
+        )
+        self.client.login(username='admin', password='password')
+        self.location = LocationFactory()
+
+    def test_location_add_view(self):
+        """
+        Tests that the location add view loads correctly and contains the map widget.
+        """
+        url = reverse('admin:places_location_add')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin/places/location/change_form.html')
+        self.assertContains(response, 'leaflet.css')
+        self.assertContains(response, 'leaflet.js')
+        self.assertContains(response, '<div id="map"')
+
+    def test_location_change_view(self):
+        """
+        Tests that the location change view loads correctly and contains the map widget.
+        """
+        url = reverse('admin:places_location_change', args=[self.location.pk])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin/places/location/change_form.html')
+        self.assertContains(response, 'leaflet.css')
+        self.assertContains(response, 'leaflet.js')
+        self.assertContains(response, '<div id="map"')
+
+    def test_location_form_save(self):
+        """
+        Tests that the location form correctly saves the latitude and longitude.
+        """
+        url = reverse('admin:places_location_add')
+        data = {
+            'latitude': '53.8',
+            'longitude': '-1.5',
+            'address': '123 Test Street',
+            'business_set-TOTAL_FORMS': '1',
+            'business_set-INITIAL_FORMS': '0',
+            'business_set-MIN_NUM_FORMS': '0',
+            'business_set-MAX_NUM_FORMS': '1000',
+            'business_set-0-name': '',
+            'business_set-0-business_group': '',
+            'business_set-0-category': '',
+            'business_set-0-date_opened': '',
+            'business_set-0-date_closed': '',
+            'business_set-0-notes': '',
+            'business_set-0-DELETE': '',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+
+        # Follow the redirect and check for the success message
+        response = self.client.get(response.url)
+        self.assertContains(response, "was added successfully.")
+
+        # Check that the location was created with the correct data
+        location = Location.objects.get(address='123 Test Street')
+        self.assertEqual(location.latitude, 53.8)
+        self.assertEqual(location.longitude, -1.5)
