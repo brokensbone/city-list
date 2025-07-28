@@ -1,9 +1,8 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_urls static %}
-
 {% block field_sets %}
-<div id="map" style="height: 400px;"></div>
-<script>
+    <div id="map" style="height: 400px;"></div>
+    <script>
     document.addEventListener('DOMContentLoaded', function () {
         var lat_input = document.getElementById('id_latitude');
         var lng_input = document.getElementById('id_longitude');
@@ -38,8 +37,8 @@
             lng_input.value = e.latlng.lng;
         });
     });
-</script>
-{% for fieldset in adminform %}
-  {% include "admin/includes/fieldset.html" %}
-{% endfor %}
+    </script>
+    {% for fieldset in adminform %}
+        {% include "admin/includes/fieldset.html" %}
+    {% endfor %}
 {% endblock %}

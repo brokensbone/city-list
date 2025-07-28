@@ -1,6 +1,5 @@
 from django import forms
 from .models import Location
-from .widgets import MapPickerWidget
 
 class LocationForm(forms.ModelForm):
     latitude = forms.FloatField(widget=forms.HiddenInput())
