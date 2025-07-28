@@ -1,0 +1,44 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static %}
+{% block field_sets %}
+    <div id="map" style="height: 400px;"></div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var lat_input = document.getElementById('id_latitude');
+        var lng_input = document.getElementById('id_longitude');
+        var lat = lat_input.value;
+        var lng = lng_input.value;
+
+        if (!lat || !lng) {
+            lat = 53.8008;
+            lng = -1.5491;
+        }
+
+        var map = L.map('map').setView([lat, lng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        var marker = L.marker([lat, lng], {
+            draggable: true
+        }).addTo(map);
+
+        marker.on('dragend', function (e) {
+            var latlng = e.target.getLatLng();
+            lat_input.value = latlng.lat;
+            lng_input.value = latlng.lng;
+        });
+
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            lat_input.value = e.latlng.lat;
+            lng_input.value = e.latlng.lng;
+        });
+    });
+    </script>
+    {% for fieldset in adminform %}
+        {% include "admin/includes/fieldset.html" %}
+    {% endfor %}
+{% endblock %}
