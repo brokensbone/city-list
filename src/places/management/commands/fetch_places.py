@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from places.models import ImportedPlace, Location
 
 import overpy
 
 
 class Command(BaseCommand):
-    help = "Fetches places from Overpass API"
+    help = "Fetches places from Overpass API and stores them in the database"
 
     def get_query(self):
         place_queries = ""
@@ -26,7 +27,7 @@ class Command(BaseCommand):
         """
         return query
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         api = overpy.Overpass()
         query = self.get_query()
 
@@ -34,24 +35,54 @@ class Command(BaseCommand):
             result = api.query(query)
             total = len(result.nodes) + len(result.ways) + len(result.relations)
             self.stdout.write(
-                self.style.SUCCESS(f"Found {total} places in the specified area:")
+                self.style.SUCCESS(f"Found {total} places in the specified area.")
             )
 
-            for node in result.nodes:
-                name = node.tags.get("name", "Unnamed Place")
-                self.stdout.write(f"- {name} @ {node.lat:.5f}, {node.lon:.5f}")
+            created_count = 0
+            updated_count = 0
 
-            for way in result.ways:
-                name = way.tags.get("name", "Unnamed Place")
-                lat = way.center_lat or 0.0
-                lon = way.center_lon or 0.0
-                self.stdout.write(f"- {name} @ {lat:.5f}, {lon:.5f}")
+            items = result.nodes + result.ways + result.relations
+            for item in items:
+                osm_type = ""
+                if isinstance(item, overpy.Node):
+                    osm_type = ImportedPlace.OsmType.NODE
+                    lat, lon = item.lat, item.lon
+                elif isinstance(item, overpy.Way):
+                    osm_type = ImportedPlace.OsmType.WAY
+                    lat, lon = item.center_lat, item.center_lon
+                elif isinstance(item, overpy.Relation):
+                    osm_type = ImportedPlace.OsmType.RELATION
+                    lat, lon = item.center_lat, item.center_lon
+                else:
+                    lat, lon = None, None
 
-            for rel in result.relations:
-                name = rel.tags.get("name", "Unnamed Place")
-                lat = rel.center_lat or 0.0
-                lon = rel.center_lon or 0.0
-                self.stdout.write(f"- {name} @ {lat:.5f}, {lon:.5f}")
+                if not lat or not lon:
+                    continue
+
+                place, created = ImportedPlace.objects.update_or_create(
+                    osm_id=item.id,
+                    osm_type=osm_type,
+                    defaults={
+                        "name": item.tags.get("name", "Unnamed Place"),
+                        "amenity": item.tags.get("amenity"),
+                        "tags": item.tags,
+                        "latitude": lat,
+                        "longitude": lon,
+                    },
+                )
+
+                if created:
+                    created_count += 1
+                    self.stdout.write(f"CREATE: {place.name}")
+                else:
+                    updated_count += 1
+                    self.stdout.write(f"UPDATE: {place.name}")
+
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Successfully created {created_count} and updated {updated_count} places."
+                )
+            )
 
         except Exception as e:
             self.stderr.write(self.style.ERROR(f"Error querying Overpass API: {e}"))
