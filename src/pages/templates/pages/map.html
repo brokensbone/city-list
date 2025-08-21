@@ -39,6 +39,14 @@
                     marker.bindPopup(`<b><a href="/businesses/${business.id}/">${business.name}</a></b><br>${business.business_group.name}`);
                 });
             });
+        fetch('/api/imports/')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(imported_place => {
+                    var marker = L.marker([imported_place.latitude, imported_place.longitude]).addTo(map);
+                    marker.bindPopup(`<b>${imported_place.name}</a></b>`);
+                });
+            });
         </script>
     </body>
 </html>
