@@ -151,3 +151,14 @@ MAP_BOUNDS_MAX_LNG = os.environ.get('MAP_BOUNDS_MAX_LNG', '-1.4')
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
+# Overpass settings
+OVERPASS_AREA_ID = os.environ.get('OVERPASS_AREA_ID', 3600118362)
+OVERPASS_PLACE_TYPES = [
+    'bar',
+    'pub',
+    'restaurant',
+    'cafe',
+    'food_court',
+    'fast_food',
+]

@@ -2,12 +2,13 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
+
 class BusinessGroup(models.Model):
     name = models.CharField(max_length=255)
 
-
     def __str__(self):
         return self.name
+
 
 class Location(models.Model):
     latitude = models.FloatField()
@@ -21,9 +22,13 @@ class Location(models.Model):
         max_lng = float(settings.MAP_BOUNDS_MAX_LNG)
 
         if not (min_lat <= self.latitude <= max_lat):
-            raise ValidationError({'latitude': f'Latitude must be between {min_lat} and {max_lat}.'})
+            raise ValidationError(
+                {"latitude": f"Latitude must be between {min_lat} and {max_lat}."}
+            )
         if not (min_lng <= self.longitude <= max_lng):
-            raise ValidationError({'longitude': f'Longitude must be between {min_lng} and {max_lng}.'})
+            raise ValidationError(
+                {"longitude": f"Longitude must be between {min_lng} and {max_lng}."}
+            )
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -35,9 +40,9 @@ class Location(models.Model):
 
 class Business(models.Model):
     class Category(models.TextChoices):
-        RESTAURANT = 'RESTAURANT', 'Restaurant'
-        BAR = 'BAR', 'Bar'
-        SHOP = 'SHOP', 'Shop'
+        RESTAURANT = "RESTAURANT", "Restaurant"
+        BAR = "BAR", "Bar"
+        SHOP = "SHOP", "Shop"
 
     name = models.CharField(max_length=255)
     business_group = models.ForeignKey(BusinessGroup, on_delete=models.CASCADE)
@@ -55,3 +60,38 @@ class Business(models.Model):
 
     class Meta:
         verbose_name_plural = "Businesses"
+
+
+class ImportedPlace(models.Model):
+    class OsmType(models.TextChoices):
+        NODE = "NODE", "Node"
+        WAY = "WAY", "Way"
+        RELATION = "RELATION", "Relation"
+
+    osm_id = models.BigIntegerField()
+    osm_type = models.CharField(
+        max_length=10,
+        choices=OsmType.choices,
+    )
+
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    # Core details
+    name = models.CharField(max_length=255)
+    amenity = models.CharField(max_length=255)
+
+    # Store all other tags from OSM in a flexible way
+    tags = models.JSONField(default=dict)
+
+    # Timestamps for tracking syncs
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        # Ensure we don't import the same place twice
+        unique_together = ("osm_id", "osm_type")
+        verbose_name_plural = "Imported Places"
+
+    def __str__(self):
+        return f"{self.name} ({self.osm_id})"
+
