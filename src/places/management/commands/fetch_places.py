@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from places.models import ImportedPlace, Location
+from places.models import ImportedPlace
 
 import overpy
 

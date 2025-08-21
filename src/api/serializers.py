@@ -1,4 +1,3 @@
-from os import wait
 from rest_framework import serializers
 from places.models import Business, BusinessGroup, ImportedPlace, Location
 
