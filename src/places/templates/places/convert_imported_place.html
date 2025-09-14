@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Convert Imported Place{% endblock %}
+
+{% block content %}
+    <h1>Convert Imported Place</h1>
+    <p>
+        Create a new Business from the imported place: <strong>{{ imported_place.name }}</strong>
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Business</button>
+    </form>
+{% endblock %}

@@ -28,7 +28,7 @@ def map_page_view(request):
             Business.objects.filter(date_closed__isnull=True)
         ),
         "imported_places": serialize_imported_places_for_map(
-            ImportedPlace.objects.all() if show_imports else []
+            ImportedPlace.objects.filter(location__isnull=True) if show_imports else []
         ),
     }
     return render(request, "pages/map.html", context)

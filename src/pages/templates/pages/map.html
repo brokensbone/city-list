@@ -49,7 +49,7 @@
             });
             imported_places.forEach(imported_place => {
                 var marker = L.marker([imported_place.latitude, imported_place.longitude], {icon: greyIcon}).addTo(map);
-                marker.bindPopup(`<b>${imported_place.name}</a></b>`);
+                marker.bindPopup(`<b>${imported_place.name}</b><br><a href="/imported-places/${imported_place.pk}/convert/">Convert</a>`);
             });
         }
         </script>
