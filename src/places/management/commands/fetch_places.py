@@ -1,3 +1,5 @@
+import decimal
+import math
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from places.models import ImportedPlace
@@ -59,24 +61,42 @@ class Command(BaseCommand):
                 if not lat or not lon:
                     continue
 
-                place, created = ImportedPlace.objects.update_or_create(
-                    osm_id=item.id,
-                    osm_type=osm_type,
-                    defaults={
-                        "name": item.tags.get("name", "Unnamed Place"),
-                        "amenity": item.tags.get("amenity"),
-                        "tags": item.tags,
-                        "latitude": lat,
-                        "longitude": lon,
-                    },
-                )
+                defaults = {
+                    "name": item.tags.get("name", "Unnamed Place"),
+                    "amenity": item.tags.get("amenity"),
+                    "tags": item.tags,
+                    "latitude": lat,
+                    "longitude": lon,
+                }
 
-                if created:
+                try:
+                    place = ImportedPlace.objects.get(osm_id=item.id, osm_type=osm_type)
+
+                    has_changed = False
+                    for key, value in defaults.items():
+                        old_value = getattr(place, key)
+                        if type(value) is decimal.Decimal and type(old_value) is float:
+                            if not math.isclose(old_value, value):
+                                setattr(place, key, value)
+                                has_changed = True
+                        else:
+                            if old_value != value:
+                                setattr(place, key, value)
+                                has_changed = True
+
+                    if has_changed:
+                        place.save()
+                        updated_count += 1
+                        self.stdout.write(f"UPDATE: {place.name}")
+
+                except ImportedPlace.DoesNotExist:
+                    ImportedPlace.objects.create(
+                        osm_id=item.id,
+                        osm_type=osm_type,
+                        **defaults,
+                    )
                     created_count += 1
-                    self.stdout.write(f"CREATE: {place.name}")
-                else:
-                    updated_count += 1
-                    self.stdout.write(f"UPDATE: {place.name}")
+                    self.stdout.write(f"CREATE: {defaults['name']}")
 
             self.stdout.write(
                 self.style.SUCCESS(
