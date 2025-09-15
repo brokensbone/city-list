@@ -1,10 +1,16 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from .factories import BusinessFactory, BusinessGroupFactory, LocationFactory
-from .models import Location
+from .factories import (
+    BusinessFactory,
+    BusinessGroupFactory,
+    ImportedPlaceFactory,
+    LocationFactory,
+)
+from .models import Business, Location
 
 User = get_user_model()
+
 
 class BusinessViewTests(TestCase):
     def test_business_list_view(self):
@@ -17,16 +23,16 @@ class BusinessViewTests(TestCase):
         business_c = BusinessFactory(name="Cobra Cafe")
         business_b = BusinessFactory(name="Badger Cafe")
 
-        response = self.client.get(reverse('places:business-list'))
+        response = self.client.get(reverse("places:business-list"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'places/business_list.html')
+        self.assertTemplateUsed(response, "places/business_list.html")
         self.assertContains(response, "Aardvark Cafe")
         self.assertContains(response, "Badger Cafe")
         self.assertContains(response, "Cobra Cafe")
 
         # Check that the businesses are ordered alphabetically
-        businesses_in_context = list(response.context['businesses'])
+        businesses_in_context = list(response.context["businesses"])
         self.assertEqual(businesses_in_context[0], business_a)
         self.assertEqual(businesses_in_context[1], business_b)
         self.assertEqual(businesses_in_context[2], business_c)
@@ -37,13 +43,31 @@ class BusinessViewTests(TestCase):
         uses the correct template, and displays the correct business details.
         """
         business = BusinessFactory()
-        response = self.client.get(reverse('places:business-detail', kwargs={'pk': business.pk}))
+        response = self.client.get(
+            reverse("places:business_detail", kwargs={"pk": business.pk})
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'places/business_detail.html')
+        self.assertTemplateUsed(response, "places/business_detail.html")
         self.assertContains(response, business.name)
         self.assertContains(response, business.business_group.name)
         self.assertContains(response, business.get_category_display())
+
+    def test_business_detail_view_with_imported_place(self):
+        """
+        Tests that the business detail view shows imported place details if linked.
+        """
+        imported_place = ImportedPlaceFactory()
+        business = BusinessFactory(location=imported_place.location)
+        response = self.client.get(
+            reverse("places:business_detail", kwargs={"pk": business.pk})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "places/business_detail.html")
+        self.assertContains(response, "Imported Details")
+        self.assertContains(response, imported_place.name)
+
 
 class BusinessGroupViewTests(TestCase):
     def test_business_group_detail_view(self):
@@ -52,7 +76,9 @@ class BusinessGroupViewTests(TestCase):
         uses the correct template, and displays the correct businesses.
         """
         business_group = BusinessGroupFactory()
-        business_a = BusinessFactory(business_group=business_group, name="Aardvark Cafe")
+        business_a = BusinessFactory(
+            business_group=business_group, name="Aardvark Cafe"
+        )
         business_c = BusinessFactory(business_group=business_group, name="Cobra Cafe")
         business_b = BusinessFactory(business_group=business_group, name="Badger Cafe")
 
@@ -60,10 +86,12 @@ class BusinessGroupViewTests(TestCase):
         other_group = BusinessGroupFactory()
         BusinessFactory(business_group=other_group, name="Don't Show Me")
 
-        response = self.client.get(reverse('places:business-group-detail', kwargs={'pk': business_group.pk}))
+        response = self.client.get(
+            reverse("places:business-group-detail", kwargs={"pk": business_group.pk})
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'places/business_group_detail.html')
+        self.assertTemplateUsed(response, "places/business_group_detail.html")
         self.assertContains(response, business_group.name)
         self.assertContains(response, "Aardvark Cafe")
         self.assertContains(response, "Badger Cafe")
@@ -71,65 +99,158 @@ class BusinessGroupViewTests(TestCase):
         self.assertNotContains(response, "Don't Show Me")
 
         # Check that the businesses are ordered alphabetically
-        businesses_in_context = list(response.context['businesses'])
+        businesses_in_context = list(response.context["businesses"])
         self.assertEqual(businesses_in_context[0], business_a)
         self.assertEqual(businesses_in_context[1], business_b)
         self.assertEqual(businesses_in_context[2], business_c)
 
+
+class ConvertImportedPlaceViewTests(TestCase):
+    def setUp(self):
+        self.imported_place = ImportedPlaceFactory()
+        self.url = reverse(
+            "places:convert_imported_place", kwargs={"pk": self.imported_place.pk}
+        )
+
+    def test_convert_imported_place_get(self):
+        """
+        Tests that the GET request to the convert view returns a 200 status code,
+        uses the correct template, and pre-populates the form.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "places/convert_imported_place.html")
+        self.assertContains(response, self.imported_place.name)
+        self.assertEqual(
+            response.context["form"].initial["name"], self.imported_place.name
+        )
+
+    def test_convert_imported_place_get_category_mapping(self):
+        """
+        Tests that the category is correctly pre-selected based on the amenity.
+        """
+        # Test restaurant
+        imported_place = ImportedPlaceFactory(amenity="restaurant")
+        url = reverse(
+            "places:convert_imported_place", kwargs={"pk": imported_place.pk}
+        )
+        response = self.client.get(url)
+        self.assertEqual(
+            response.context["form"].initial["category"], Business.Category.RESTAURANT
+        )
+
+        # Test bar
+        imported_place = ImportedPlaceFactory(amenity="pub")
+        url = reverse(
+            "places:convert_imported_place", kwargs={"pk": imported_place.pk}
+        )
+        response = self.client.get(url)
+        self.assertEqual(
+            response.context["form"].initial["category"], Business.Category.BAR
+        )
+
+        # Test shop (default)
+        imported_place = ImportedPlaceFactory(amenity="other")
+        url = reverse(
+            "places:convert_imported_place", kwargs={"pk": imported_place.pk}
+        )
+        response = self.client.get(url)
+        self.assertEqual(
+            response.context["form"].initial["category"], Business.Category.SHOP
+        )
+
+    def test_convert_imported_place_post(self):
+        """
+        Tests that a POST request creates a new Location and Business,
+        links the ImportedPlace, and redirects.
+        """
+        business_group = BusinessGroupFactory()
+        data = {
+            "name": "New Cafe",
+            "business_group": business_group.pk,
+            "category": Business.Category.RESTAURANT,
+            "date_opened": "2024-01-01",
+        }
+        response = self.client.post(self.url, data)
+
+        # Check that a new Location was created
+        self.assertTrue(
+            Location.objects.filter(
+                latitude=self.imported_place.latitude,
+                longitude=self.imported_place.longitude,
+            ).exists()
+        )
+        location = Location.objects.get(latitude=self.imported_place.latitude)
+
+        # Check that a new Business was created
+        self.assertTrue(Business.objects.filter(name="New Cafe").exists())
+        business = Business.objects.get(name="New Cafe")
+        self.assertEqual(business.location, location)
+
+        # Check that the ImportedPlace was linked
+        self.imported_place.refresh_from_db()
+        self.assertEqual(self.imported_place.location, location)
+
+        # Check for the redirect
+        self.assertRedirects(
+            response, reverse("places:business_detail", kwargs={"pk": business.pk})
+        )
+
+
 class LocationAdminTests(TestCase):
     def setUp(self):
         self.superuser = User.objects.create_superuser(
-            'admin', 'admin@example.com', 'password'
+            "admin", "admin@example.com", "password"
         )
-        self.client.login(username='admin', password='password')
+        self.client.login(username="admin", password="password")
         self.location = LocationFactory()
 
     def test_location_add_view(self):
         """
         Tests that the location add view loads correctly and contains the map widget.
         """
-        url = reverse('admin:places_location_add')
+        url = reverse("admin:places_location_add")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'admin/places/location/change_form.html')
-        self.assertContains(response, 'leaflet.css')
-        self.assertContains(response, 'leaflet.js')
+        self.assertTemplateUsed(response, "admin/places/location/change_form.html")
+        self.assertContains(response, "leaflet.css")
+        self.assertContains(response, "leaflet.js")
         self.assertContains(response, '<div id="map"')
 
     def test_location_change_view(self):
         """
         Tests that the location change view loads correctly and contains the map widget.
         """
-        url = reverse('admin:places_location_change', args=[self.location.pk])
+        url = reverse("admin:places_location_change", args=[self.location.pk])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'admin/places/location/change_form.html')
-        self.assertContains(response, 'leaflet.css')
-        self.assertContains(response, 'leaflet.js')
+        self.assertTemplateUsed(response, "admin/places/location/change_form.html")
+        self.assertContains(response, "leaflet.css")
+        self.assertContains(response, "leaflet.js")
         self.assertContains(response, '<div id="map"')
 
     def test_location_form_save(self):
         """
         Tests that the location form correctly saves the latitude and longitude.
         """
-        url = reverse('admin:places_location_add')
+        url = reverse("admin:places_location_add")
         data = {
-            'latitude': '53.8',
-            'longitude': '-1.5',
-            'address': '123 Test Street',
-            'business_set-TOTAL_FORMS': '1',
-            'business_set-INITIAL_FORMS': '0',
-            'business_set-MIN_NUM_FORMS': '0',
-            'business_set-MAX_NUM_FORMS': '1000',
-            'business_set-0-name': '',
-            'business_set-0-business_group': '',
-            'business_set-0-category': '',
-            'business_set-0-date_opened': '',
-            'business_set-0-date_closed': '',
-            'business_set-0-notes': '',
-            'business_set-0-DELETE': '',
+            "latitude": "53.8",
+            "longitude": "-1.5",
+            "address": "123 Test Street",
+            "business_set-TOTAL_FORMS": "1",
+            "business_set-INITIAL_FORMS": "0",
+            "business_set-MIN_NUM_FORMS": "0",
+            "business_set-MAX_NUM_FORMS": "1000",
+            "business_set-0-name": "",
+            "business_set-0-business_group": "",
+            "business_set-0-category": "",
+            "business_set-0-date_opened": "",
+            "business_set-0-date_closed": "",
+            "business_set-0-notes": "",
+            "business_set-0-DELETE": "",
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
@@ -139,6 +260,6 @@ class LocationAdminTests(TestCase):
         self.assertContains(response, "was added successfully.")
 
         # Check that the location was created with the correct data
-        location = Location.objects.get(address='123 Test Street')
+        location = Location.objects.get(address="123 Test Street")
         self.assertEqual(location.latitude, 53.8)
         self.assertEqual(location.longitude, -1.5)

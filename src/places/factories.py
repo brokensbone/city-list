@@ -1,6 +1,6 @@
 import factory
 from factory.django import DjangoModelFactory
-from .models import Business, BusinessGroup, Location
+from .models import Business, BusinessGroup, Location, ImportedPlace
 from django.conf import settings
 
 class BusinessGroupFactory(DjangoModelFactory):
@@ -36,3 +36,23 @@ class BusinessFactory(DjangoModelFactory):
     date_opened = factory.Faker('date_between', start_date='-10y', end_date='today')
     date_closed = None
     notes = factory.Faker('paragraph')
+
+class ImportedPlaceFactory(DjangoModelFactory):
+    class Meta:
+        model = ImportedPlace
+
+    osm_id = factory.Faker('pyint')
+    osm_type = factory.Iterator([choice[0] for choice in ImportedPlace.OsmType.choices])
+    name = factory.Faker('company')
+    amenity = factory.Faker('word')
+    latitude = factory.Faker(
+        'pyfloat',
+        min_value=float(settings.MAP_BOUNDS_MIN_LAT),
+        max_value=float(settings.MAP_BOUNDS_MAX_LAT)
+    )
+    longitude = factory.Faker(
+        'pyfloat',
+        min_value=float(settings.MAP_BOUNDS_MIN_LNG),
+        max_value=float(settings.MAP_BOUNDS_MAX_LNG)
+    )
+    location = factory.SubFactory(LocationFactory)

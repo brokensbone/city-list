@@ -6,7 +6,7 @@
     <ul class="business-list">
         {% for business in businesses %}
             <li>
-                <a href="{% url 'places:business-detail' business.pk %}">{{ business.name }}</a>
+                <a href="{% url 'places:business_detail' business.pk %}">{{ business.name }}</a>
             </li>
         {% endfor %}
     </ul>

@@ -87,6 +87,11 @@ class ImportedPlace(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Link to a Location if this place has been converted
+    location = models.OneToOneField(
+        Location, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
     class Meta:
         # Ensure we don't import the same place twice
         unique_together = ("osm_id", "osm_type")
