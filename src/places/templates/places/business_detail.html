@@ -28,6 +28,24 @@
             <h2>Notes</h2>
             <p>{{ business.notes }}</p>
         {% endif %}
+        {% if imported_place %}
+            <h2>Imported Details</h2>
+            <p>Originally imported from OpenStreetMap.</p>
+            <ul>
+                <li>
+                    <strong>OSM Name:</strong> {{ imported_place.name }}
+                </li>
+                <li>
+                    <strong>OSM Amenity:</strong> {{ imported_place.amenity }}
+                </li>
+                <li>
+                    <strong>OSM ID:</strong> {{ imported_place.osm_id }}
+                </li>
+                <li>
+                    <strong>OSM Type:</strong> {{ imported_place.osm_type }}
+                </li>
+            </ul>
+        {% endif %}
         <br>
         <a href="{% url 'map' %}?lat={{ business.location.latitude }}&lng={{ business.location.longitude }}&zoom=17">View on map</a>
         <br>
