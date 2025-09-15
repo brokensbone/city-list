@@ -64,7 +64,7 @@ def convert_imported_place(request, pk):
             imported_place.location = location
             imported_place.save()
 
-            return redirect("business_detail", pk=business.pk)
+            return redirect("places:business_detail", pk=business.pk)
     else:
         form = BusinessFromImportForm(
             initial={
