@@ -66,9 +66,17 @@ def convert_imported_place(request, pk):
 
             return redirect("places:business_detail", pk=business.pk)
     else:
+        # Map amenity to category
+        category = Business.Category.SHOP
+        if imported_place.amenity in ["restaurant", "cafe", "fast_food"]:
+            category = Business.Category.RESTAURANT
+        elif imported_place.amenity in ["bar", "pub"]:
+            category = Business.Category.BAR
+
         form = BusinessFromImportForm(
             initial={
                 "name": imported_place.name,
+                "category": category,
             }
         )
 

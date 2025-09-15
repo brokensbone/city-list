@@ -125,6 +125,40 @@ class ConvertImportedPlaceViewTests(TestCase):
             response.context["form"].initial["name"], self.imported_place.name
         )
 
+    def test_convert_imported_place_get_category_mapping(self):
+        """
+        Tests that the category is correctly pre-selected based on the amenity.
+        """
+        # Test restaurant
+        imported_place = ImportedPlaceFactory(amenity="restaurant")
+        url = reverse(
+            "places:convert_imported_place", kwargs={"pk": imported_place.pk}
+        )
+        response = self.client.get(url)
+        self.assertEqual(
+            response.context["form"].initial["category"], Business.Category.RESTAURANT
+        )
+
+        # Test bar
+        imported_place = ImportedPlaceFactory(amenity="pub")
+        url = reverse(
+            "places:convert_imported_place", kwargs={"pk": imported_place.pk}
+        )
+        response = self.client.get(url)
+        self.assertEqual(
+            response.context["form"].initial["category"], Business.Category.BAR
+        )
+
+        # Test shop (default)
+        imported_place = ImportedPlaceFactory(amenity="other")
+        url = reverse(
+            "places:convert_imported_place", kwargs={"pk": imported_place.pk}
+        )
+        response = self.client.get(url)
+        self.assertEqual(
+            response.context["form"].initial["category"], Business.Category.SHOP
+        )
+
     def test_convert_imported_place_post(self):
         """
         Tests that a POST request creates a new Location and Business,
